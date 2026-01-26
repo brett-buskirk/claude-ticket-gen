@@ -41,7 +41,7 @@ npx claude-ticket-gen --help
 ### From Source
 
 ```bash
-git clone https://github.com/offgriddev/claude-ticket-generator.git
+git clone https://github.com/brett-buskirk/claude-ticket-generator.git
 cd claude-ticket-generator
 npm install
 npm run build
