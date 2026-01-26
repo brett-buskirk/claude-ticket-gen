@@ -28,13 +28,13 @@ Claude Ticket Generator is a standalone npm package that uses Claude AI to intel
 ### Global Installation (Recommended)
 
 ```bash
-npm install -g claude-ticket-gen
+npm install -g claude-gh-ticket-gen
 ```
 
 ### Local Installation
 
 ```bash
-npm install claude-ticket-gen
+npm install claude-gh-ticket-gen
 npx claude-ticket-gen --help
 ```
 

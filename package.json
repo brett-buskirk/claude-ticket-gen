@@ -1,5 +1,5 @@
 {
-  "name": "claude-ticket-gen",
+  "name": "claude-gh-ticket-gen",
   "version": "1.0.0",
   "description": "AI-powered CLI tool to parse roadmap documents and generate GitHub issues",
   "main": "dist/cli/index.js",
