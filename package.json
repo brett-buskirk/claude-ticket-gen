@@ -4,7 +4,7 @@
   "description": "AI-powered CLI tool to parse roadmap documents and generate GitHub issues",
   "main": "dist/cli/index.js",
   "bin": {
-    "claude-ticket-gen": "./bin/claude-ticket-gen.js"
+    "claude-ticket-gen": "bin/claude-ticket-gen.js"
   },
   "type": "module",
   "scripts": {
@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brett-buskirk/claude-ticket-gen.git"
+    "url": "git+https://github.com/brett-buskirk/claude-ticket-gen.git"
   },
   "homepage": "https://github.com/brett-buskirk/claude-ticket-gen#readme",
   "bugs": {

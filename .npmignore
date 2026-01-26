@@ -11,6 +11,7 @@ tsconfig.json
 .git/
 .vscode/
 .idea/
+.claude/
 *.swp
 
 # Testing
