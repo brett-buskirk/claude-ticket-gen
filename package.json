@@ -24,8 +24,16 @@
     "planning",
     "automation"
   ],
-  "author": "",
+  "author": "Brett Buskirk",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brett-buskirk/claude-ticket-gen.git"
+  },
+  "homepage": "https://github.com/brett-buskirk/claude-ticket-gen#readme",
+  "bugs": {
+    "url": "https://github.com/brett-buskirk/claude-ticket-gen/issues"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "commander": "^12.0.0",

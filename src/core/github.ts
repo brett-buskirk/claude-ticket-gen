@@ -79,12 +79,11 @@ export async function createIssue(
     // Filter to only use labels that exist
     const validLabels = labels.filter(label => existingLabelNames.has(label.toLowerCase()));
 
-    // Escape title and body for shell
-    const escapedTitle = task.title.replace(/"/g, '\\"');
-    const escapedBody = body.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    // Escape title for shell (single quotes to avoid escaping issues)
+    const escapedTitle = task.title.replace(/'/g, "'\\''");
 
-    // Create issue with valid labels only
-    let command = `gh issue create --repo ${repo} --title "${escapedTitle}" --body "${escapedBody}"`;
+    // Create issue with valid labels only, using stdin for body to preserve newlines
+    let command = `gh issue create --repo ${repo} --title '${escapedTitle}' --body-file -`;
 
     if (validLabels.length > 0) {
       const labelString = validLabels.join(',');
@@ -92,6 +91,7 @@ export async function createIssue(
     }
 
     const output = execSync(command, {
+      input: body,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     });
