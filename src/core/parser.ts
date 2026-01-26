@@ -37,7 +37,7 @@ export async function parseDocumentContent(content: string): Promise<ParsedTask[
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         {
           role: 'user',
@@ -53,6 +53,15 @@ export async function parseDocumentContent(content: string): Promise<ParsedTask[
     }
 
     const responseText = textContent.text.trim();
+
+    // Check if response was truncated
+    if (response.stop_reason === 'max_tokens') {
+      throw new Error(
+        'Response was truncated due to length limits. ' +
+        'Try: 1) Using --filter-phase to process sections separately, or ' +
+        '2) Breaking document into smaller files'
+      );
+    }
 
     // Parse JSON response
     const tasks = parseTasksFromResponse(responseText);
@@ -70,14 +79,16 @@ export async function parseDocumentContent(content: string): Promise<ParsedTask[
  * Parse tasks from API response text
  */
 function parseTasksFromResponse(responseText: string): ParsedTask[] {
-  // Try to extract JSON from response (in case there's markdown formatting)
-  let jsonText = responseText;
+  let jsonText = responseText.trim();
 
-  // Remove markdown code blocks if present
-  if (responseText.includes('```')) {
-    const match = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) {
-      jsonText = match[1];
+  // Remove markdown code blocks - find content between ``` markers
+  if (jsonText.includes('```')) {
+    // Find the first [ and last ] which should be the JSON array
+    const firstBracket = jsonText.indexOf('[');
+    const lastBracket = jsonText.lastIndexOf(']');
+
+    if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+      jsonText = jsonText.substring(firstBracket, lastBracket + 1);
     }
   }
 
@@ -92,7 +103,35 @@ function parseTasksFromResponse(responseText: string): ParsedTask[] {
     // Validate and sanitize each task
     return parsed.map((task, index) => validateAndSanitizeTask(task, index));
   } catch (error) {
-    throw new Error(`Failed to parse tasks from response: ${(error as Error).message}`);
+    // Try to salvage incomplete JSON by finding last complete object
+    if ((error as Error).message.includes('Unterminated string') ||
+        (error as Error).message.includes('Unexpected end')) {
+      try {
+        // Find the last complete object by looking for the last },
+        const lastComplete = jsonText.lastIndexOf('},');
+        if (lastComplete !== -1) {
+          const salvaged = jsonText.substring(0, lastComplete + 1) + '\n]';
+          const parsed = JSON.parse(salvaged);
+
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.warn(`Warning: Response was incomplete. Parsed ${parsed.length} tasks (some may be missing)`);
+            return parsed.map((task, index) => validateAndSanitizeTask(task, index));
+          }
+        }
+      } catch {
+        // Salvage attempt failed, fall through to original error
+      }
+    }
+
+    // Include useful debugging info
+    const sample = jsonText.substring(0, 200);
+    const ending = jsonText.length > 200 ? jsonText.substring(jsonText.length - 200) : '';
+    throw new Error(
+      `Failed to parse tasks from response: ${(error as Error).message}\n` +
+      `Response length: ${jsonText.length} characters\n` +
+      `Start: ${sample}...\n` +
+      `End: ...${ending}`
+    );
   }
 }
 

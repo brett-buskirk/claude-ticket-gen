@@ -16,7 +16,7 @@ Instructions:
 1. Identify ALL tasks and actionable items in the document
 2. For each task, determine:
    - Title: A clear, concise title (imperative form, e.g., "Add user authentication")
-   - Description: Detailed context, acceptance criteria, and notes
+   - Description: Brief summary (1-2 sentences max, under 150 chars). Include key details only.
    - Priority: P0 (critical), P1 (high), P2 (medium), P3 (low)
      * Look for keywords like "critical", "urgent", "important", "nice-to-have", "optional"
      * Consider placement and context (early sections often higher priority)
@@ -26,7 +26,7 @@ Instructions:
    - Status: Is it marked as completed? (✓, [x], "done", "completed")
    - Optional: Is it marked as optional or nice-to-have?
    - Labels: Relevant tags (extract from context, e.g., "backend", "frontend", "api")
-   - Subtasks: Any nested or related subtasks
+   - Subtasks: List of strings, keep brief (3-5 items max)
    - Metadata: milestone, target date, dependencies (if mentioned)
 
 3. Be intelligent about extraction:
@@ -59,8 +59,12 @@ Instructions:
 
 Important:
 - Return ONLY the JSON array, no explanations or markdown formatting
-- Ensure all JSON is valid and properly escaped
+- Ensure all JSON is valid and properly escaped (escape quotes, newlines, etc.)
+- Use \\n for newlines within strings, not actual line breaks
+- Escape all double quotes within string values as \\"
+- Keep descriptions BRIEF (under 150 chars) - details will be in the full issue
+- Keep subtask lists short (3-5 items max)
 - If no tasks found, return an empty array: []
-- Be thorough - extract every actionable item you can find
-- Preserve the original intent and context of each task`;
+- Be thorough but concise - extract every actionable item with minimal text
+- For large documents, prioritize completeness over verbosity`;
 }
