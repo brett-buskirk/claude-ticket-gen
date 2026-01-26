@@ -72,12 +72,24 @@ export async function createIssue(
       };
     }
 
+    // Get existing labels to filter out non-existent ones
+    const existingLabels = await listLabels(repo);
+    const existingLabelNames = new Set(existingLabels.map(l => l.name.toLowerCase()));
+
+    // Filter to only use labels that exist
+    const validLabels = labels.filter(label => existingLabelNames.has(label.toLowerCase()));
+
     // Escape title and body for shell
     const escapedTitle = task.title.replace(/"/g, '\\"');
     const escapedBody = body.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    const labelString = labels.join(',');
 
-    const command = `gh issue create --repo ${repo} --title "${escapedTitle}" --body "${escapedBody}" --label "${labelString}"`;
+    // Create issue with valid labels only
+    let command = `gh issue create --repo ${repo} --title "${escapedTitle}" --body "${escapedBody}"`;
+
+    if (validLabels.length > 0) {
+      const labelString = validLabels.join(',');
+      command += ` --label "${labelString}"`;
+    }
 
     const output = execSync(command, {
       encoding: 'utf-8',
@@ -169,6 +181,29 @@ export async function ensureLabelsExist(repo: string, labelColors: { [key: strin
 
   for (const label of labels) {
     await createLabel(label.name, label.color, repo);
+  }
+}
+
+/**
+ * Create custom labels from tasks
+ */
+export async function ensureCustomLabels(
+  tasks: ParsedTask[],
+  repo: string,
+  defaultColor: string = '0E8A16'
+): Promise<void> {
+  // Collect all unique custom labels from tasks
+  const customLabels = new Set<string>();
+
+  for (const task of tasks) {
+    for (const label of task.labels) {
+      customLabels.add(label);
+    }
+  }
+
+  // Create each custom label
+  for (const label of customLabels) {
+    await createLabel(label, defaultColor, repo);
   }
 }
 

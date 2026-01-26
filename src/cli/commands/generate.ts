@@ -7,7 +7,7 @@ import { resolve } from 'path';
 import { ParsedTask, GenerateOptions, GenerationSummary, Priority } from '../../core/types.js';
 import { loadConfig, validateConfig } from '../../core/config-manager.js';
 import { parseWithRetry } from '../../core/parser.js';
-import { checkGhInstalled, checkGhAuth, getCurrentRepo, createIssue, ensureLabelsExist } from '../../core/github.js';
+import { checkGhInstalled, checkGhAuth, getCurrentRepo, createIssue, ensureLabelsExist, ensureCustomLabels } from '../../core/github.js';
 import { checkDuplicate } from '../../core/duplicate-detector.js';
 import { logger } from '../../utils/logger.js';
 import { validateFilePath, validateRepoFormat, validatePriority } from '../../utils/validators.js';
@@ -82,6 +82,7 @@ export async function generateCommand(file?: string, options: GenerateOptions = 
       const labelSpinner = startSpinner('Ensuring labels exist...');
       try {
         await ensureLabelsExist(repo, config.labelColors);
+        await ensureCustomLabels(filteredTasks, repo);
         succeedSpinner(labelSpinner, 'Labels ready');
       } catch (error) {
         failSpinner(labelSpinner, 'Failed to create labels (continuing anyway)');
