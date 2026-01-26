@@ -1,0 +1,22 @@
+{
+  "anthropicApiKey": "sk-ant-your-api-key-here",
+  "defaultRepo": "owner/repo",
+  "defaultDocPath": "ROADMAP.md",
+  "preferences": {
+    "dryRunByDefault": false,
+    "autoCreateLabels": true,
+    "checkDuplicates": true,
+    "duplicateThreshold": 0.8
+  },
+  "labelColors": {
+    "priority-critical": "B60205",
+    "priority-high": "D93F0B",
+    "priority-medium": "FBCA04",
+    "priority-low": "0E8A16",
+    "type-feature": "0075CA",
+    "type-bug": "D73A4A",
+    "type-tech-debt": "F9D0C4",
+    "type-documentation": "0E8A16",
+    "optional": "E4E669"
+  }
+}

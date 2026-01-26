@@ -1,0 +1,24 @@
+# Source files (we ship dist/)
+src/
+tests/
+notes/
+
+# Config files
+tsconfig.json
+.gitignore
+
+# Development
+.git/
+.vscode/
+.idea/
+*.swp
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+
+# Examples (optionally include these)
+# examples/
