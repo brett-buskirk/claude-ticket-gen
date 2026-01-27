@@ -21,5 +21,8 @@ coverage/
 # Logs
 *.log
 
+# Screenshots (for GitHub only)
+screenshots/
+
 # Examples (optionally include these)
 # examples/

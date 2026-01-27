@@ -17,6 +17,20 @@ Claude Ticket Generator is a standalone npm package that uses Claude AI to intel
 - **Filtering**: Filter by phase, priority, and optional items
 - **Interactive Setup**: Easy configuration wizard
 
+## Screenshots
+
+**CLI Preview (Dry Run)**
+
+![Dry run preview showing parsed tasks](screenshots/dry-run/dry-run-01.png)
+
+**Generated GitHub Issues**
+
+![GitHub issues list with labels](screenshots/repo-screenshots/issue-list.png)
+
+**Individual Issue Detail**
+
+![Individual issue with subtasks](screenshots/repo-screenshots/individual-issue.png)
+
 ## Prerequisites
 
 - Node.js >= 18.0.0
@@ -359,6 +373,17 @@ claude-ticket-gen generate --filter-phase "Phase 1: Foundation"
 # Preview including optional tasks
 claude-ticket-gen generate --dry-run --include-optional
 ```
+
+**Example: Creating Issues with Phase Filtering**
+
+![Production run with confirmation](screenshots/prod-run/prod-run-02.png)
+
+The tool will:
+1. Parse only the specified phase from your document
+2. Show a preview of tasks to be created
+3. Ask for confirmation before creating issues
+4. Automatically create labels if they don't exist
+5. Create each issue with proper formatting and labels
 
 ## Development
 
