@@ -401,6 +401,5 @@ MIT
 
 ## Acknowledgments
 
-- Built with [Claude AI](https://www.anthropic.com/claude)
 - Uses [GitHub CLI](https://cli.github.com/)
 - Powered by [@anthropic-ai/sdk](https://www.npmjs.com/package/@anthropic-ai/sdk)

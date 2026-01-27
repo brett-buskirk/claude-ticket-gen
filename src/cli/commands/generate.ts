@@ -2,16 +2,17 @@
  * Generate command implementation
  */
 
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { ParsedTask, GenerateOptions, GenerationSummary, Priority } from '../../core/types.js';
 import { loadConfig, validateConfig } from '../../core/config-manager.js';
-import { parseWithRetry } from '../../core/parser.js';
+import { parseWithRetry, parseDocumentContent } from '../../core/parser.js';
 import { checkGhInstalled, checkGhAuth, getCurrentRepo, createIssue, ensureLabelsExist, ensureCustomLabels } from '../../core/github.js';
 import { checkDuplicate } from '../../core/duplicate-detector.js';
 import { logger } from '../../utils/logger.js';
 import { validateFilePath, validateRepoFormat, validatePriority } from '../../utils/validators.js';
 import { startSpinner, succeedSpinner, failSpinner, displayPreview, displaySummary, updateSpinner } from '../ui.js';
+import { extractPhaseFromDocument } from '../../utils/document-filter.js';
 import inquirer from 'inquirer';
 
 /**
@@ -28,13 +29,28 @@ export async function generateCommand(file?: string, options: GenerateOptions = 
     // 3. Determine target repo
     const repo = await resolveRepo(options.repo);
 
-    // 4. Parse document
+    // 4. Parse document (with optional pre-filtering)
     logger.header('Parsing Document');
     const spinner = startSpinner('Parsing document with Claude AI...');
 
     let tasks: ParsedTask[];
+    let didPreFilter = false;
     try {
-      tasks = await parseWithRetry(filePath);
+      // Pre-filter document by phase if specified (reduces token usage)
+      if (options.filterPhase) {
+        const content = readFileSync(filePath, 'utf-8');
+        const filteredContent = extractPhaseFromDocument(content, options.filterPhase);
+
+        if (filteredContent !== content) {
+          updateSpinner(spinner, `Parsing "${options.filterPhase}" section...`);
+          didPreFilter = true;
+        }
+
+        tasks = await parseDocumentContent(filteredContent);
+      } else {
+        tasks = await parseWithRetry(filePath);
+      }
+
       succeedSpinner(spinner, `Parsed ${tasks.length} tasks from document`);
     } catch (error) {
       failSpinner(spinner, 'Failed to parse document');
@@ -46,8 +62,11 @@ export async function generateCommand(file?: string, options: GenerateOptions = 
       return;
     }
 
-    // 5. Filter tasks
-    const filteredTasks = filterTasks(tasks, options);
+    // 5. Filter tasks (skip phase filter if we already pre-filtered the document)
+    const filteredTasks = filterTasks(tasks, {
+      ...options,
+      filterPhase: didPreFilter ? undefined : options.filterPhase,
+    });
     logger.info(`${filteredTasks.length} tasks after filtering`);
 
     if (filteredTasks.length === 0) {
