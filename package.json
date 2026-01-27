@@ -1,6 +1,6 @@
 {
   "name": "claude-gh-ticket-gen",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AI-powered CLI tool to parse roadmap documents and generate GitHub issues",
   "main": "dist/cli/index.js",
   "bin": {
