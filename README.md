@@ -155,6 +155,10 @@ claude-ticket-gen config set defaultRepo owner/repo
 claude-ticket-gen config reset
 ```
 
+**Configuration List Example:**
+
+![Config list showing all settings](screenshots/config-list.png)
+
 #### `init`
 
 Interactive setup wizard.
