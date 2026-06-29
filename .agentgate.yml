@@ -1,0 +1,7 @@
+# AgentGate config — https://github.com/brett-buskirk/agent-gate
+version: 1
+rules:
+  # Solo-dev repo: surface out-of-scope / CI / lockfile edits as a warning
+  # rather than a hard block. secrets + dangerous_patterns stay at error.
+  scope:
+    severity: warning
