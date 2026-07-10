@@ -6,6 +6,19 @@ All notable changes to claude-ticket-gen are documented here. The format is base
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-10
+
+### Added
+- Configurable Claude model via a new `model` config key, defaulting to `claude-haiku-4-5`.
+- `generate --model <id>` flag to override the model for a single run (precedence: flag > config > default).
+- `models` command (and a `--models` root-flag alias) that lists the models available to your API key, fetched live from the Anthropic API and marking the current default.
+
+### Fixed
+- Parsing no longer fails with a 404 from a hardcoded, since-retired model (`claude-sonnet-4-20250514`); the model is now resolved from config with a current default.
+
+### Changed
+- A bare invocation now prints help instead of exiting silently.
+
 ## [1.0.5] - 2026-01-27
 
 ### Fixed
@@ -26,5 +39,6 @@ All notable changes to claude-ticket-gen are documented here. The format is base
 - CI/CD pipeline with automated npm publishing.
 - Package provenance and attestation via GitHub Actions.
 
-[Unreleased]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/brett-buskirk/claude-ticket-gen/releases/tag/v1.0.5
