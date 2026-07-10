@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import { ParsedTask, GenerateOptions, GenerationSummary, Priority } from '../../core/types.js';
+import { ParsedTask, GenerateOptions, GenerationSummary, Priority, DEFAULT_MODEL } from '../../core/types.js';
 import { loadConfig, validateConfig } from '../../core/config-manager.js';
 import { parseWithRetry, parseDocumentContent } from '../../core/parser.js';
 import { checkGhInstalled, checkGhAuth, getCurrentRepo, createIssue, ensureLabelsExist, ensureCustomLabels } from '../../core/github.js';
@@ -29,8 +29,13 @@ export async function generateCommand(file?: string, options: GenerateOptions = 
     // 3. Determine target repo
     const repo = await resolveRepo(options.repo);
 
+    // Resolve the model once so we can report it and pass the same value to
+    // every parse call below. Precedence: --model flag > configured model > default.
+    const model = options.model || loadConfig().model || DEFAULT_MODEL;
+
     // 4. Parse document (with optional pre-filtering)
     logger.header('Parsing Document');
+    logger.info(`Using model: ${model}`);
     const spinner = startSpinner('Parsing document with Claude AI...');
 
     let tasks: ParsedTask[];
@@ -46,9 +51,9 @@ export async function generateCommand(file?: string, options: GenerateOptions = 
           didPreFilter = true;
         }
 
-        tasks = await parseDocumentContent(filteredContent);
+        tasks = await parseDocumentContent(filteredContent, model);
       } else {
-        tasks = await parseWithRetry(filePath);
+        tasks = await parseWithRetry(filePath, 3, model);
       }
 
       succeedSpinner(spinner, `Parsed ${tasks.length} tasks from document`);

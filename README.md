@@ -110,6 +110,7 @@ claude-ticket-gen generate [file] [options]
 - `--min-priority <level>` - Minimum priority level (P0-P3)
 - `--include-optional` - Include optional items
 - `--config <path>` - Use specific config file
+- `--model <id>` - Claude model to use, overriding the configured default (e.g. `claude-opus-4-8`)
 
 **Examples:**
 
@@ -134,7 +135,25 @@ claude-ticket-gen generate --filter-phase "Phase 1"
 
 # Include optional tasks
 claude-ticket-gen generate --include-optional
+
+# Use a specific model for this run
+claude-ticket-gen generate --model claude-opus-4-8
 ```
+
+#### `models`
+
+List the Claude models available to your API key. The list is fetched live from
+the Anthropic API (never a hardcoded list), and the model `generate` uses by
+default is marked.
+
+```bash
+claude-ticket-gen models
+# or, as a convenience flag:
+claude-ticket-gen --models
+```
+
+Set the default model with `config set model <id>`, or override it for a single
+run with `generate --model <id>`.
 
 #### `config`
 
@@ -150,6 +169,7 @@ claude-ticket-gen config get anthropicApiKey
 # Set value
 claude-ticket-gen config set anthropicApiKey sk-ant-...
 claude-ticket-gen config set defaultRepo owner/repo
+claude-ticket-gen config set model claude-opus-4-8
 
 # Reset to defaults
 claude-ticket-gen config reset
@@ -178,6 +198,7 @@ Configuration is stored in `~/.config/claude-ticket-gen/config.json`.
   "anthropicApiKey": "sk-ant-...",
   "defaultRepo": "owner/repo",
   "defaultDocPath": "ROADMAP.md",
+  "model": "claude-haiku-4-5",
   "preferences": {
     "dryRunByDefault": false,
     "autoCreateLabels": true,
