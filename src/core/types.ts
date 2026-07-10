@@ -33,6 +33,8 @@ export interface Config {
   anthropicApiKey?: string;
   defaultRepo?: string;
   defaultDocPath?: string;
+  /** Claude model used for parsing. Overridable per run with `generate --model`. */
+  model?: string;
   preferences: {
     dryRunByDefault: boolean;
     autoCreateLabels: boolean;
@@ -45,12 +47,23 @@ export interface Config {
 }
 
 /**
+ * Default Claude model used for parsing.
+ *
+ * Kept as a single named constant (referenced by both DEFAULT_CONFIG and the
+ * parser's fallback) so the default lives in exactly one place — a hardcoded
+ * model string scattered across files is what let a retired model linger and
+ * start returning 404s.
+ */
+export const DEFAULT_MODEL = 'claude-haiku-4-5';
+
+/**
  * Default configuration values
  */
 export const DEFAULT_CONFIG: Config = {
   anthropicApiKey: undefined,
   defaultRepo: undefined,
   defaultDocPath: 'ROADMAP.md',
+  model: DEFAULT_MODEL,
   preferences: {
     dryRunByDefault: false,
     autoCreateLabels: true,
@@ -101,6 +114,8 @@ export interface GenerateOptions {
   minPriority?: Priority;
   includeOptional?: boolean;
   config?: string;
+  /** Claude model to use for this run, overriding the configured default. */
+  model?: string;
 }
 
 /**

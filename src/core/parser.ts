@@ -4,22 +4,28 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { readFileSync } from 'fs';
-import { ParsedTask } from './types.js';
+import { ParsedTask, DEFAULT_MODEL } from './types.js';
 import { getParsingPrompt } from '../templates/parsing-prompt.js';
 import { loadConfig } from './config-manager.js';
 
 /**
- * Parse a document file and extract structured tasks
+ * Parse a document file and extract structured tasks.
+ *
+ * `model` overrides the configured default for this call (used to thread the
+ * `generate --model` flag through); omit it to use the configured model.
  */
-export async function parseDocument(filePath: string): Promise<ParsedTask[]> {
+export async function parseDocument(filePath: string, model?: string): Promise<ParsedTask[]> {
   const content = readFileSync(filePath, 'utf-8');
-  return parseDocumentContent(content);
+  return parseDocumentContent(content, model);
 }
 
 /**
  * Parse document content and extract structured tasks
  */
-export async function parseDocumentContent(content: string): Promise<ParsedTask[]> {
+export async function parseDocumentContent(
+  content: string,
+  model?: string
+): Promise<ParsedTask[]> {
   const config = loadConfig();
 
   if (!config.anthropicApiKey) {
@@ -27,6 +33,9 @@ export async function parseDocumentContent(content: string): Promise<ParsedTask[
       'Anthropic API key not configured. Set it with: claude-ticket-gen config set anthropicApiKey <key>'
     );
   }
+
+  // Precedence: explicit override (--model) > configured model > built-in default.
+  const selectedModel = model || config.model || DEFAULT_MODEL;
 
   const client = new Anthropic({
     apiKey: config.anthropicApiKey,
@@ -36,7 +45,7 @@ export async function parseDocumentContent(content: string): Promise<ParsedTask[
 
   try {
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: selectedModel,
       max_tokens: 8192,
       messages: [
         {
@@ -184,13 +193,14 @@ function validateType(type: any): boolean {
  */
 export async function parseWithRetry(
   filePath: string,
-  maxRetries: number = 3
+  maxRetries: number = 3,
+  model?: string
 ): Promise<ParsedTask[]> {
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      return await parseDocument(filePath);
+      return await parseDocument(filePath, model);
     } catch (error) {
       lastError = error as Error;
 

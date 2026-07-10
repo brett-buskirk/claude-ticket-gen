@@ -21,7 +21,11 @@ const program = new Command();
 program
   .name('claude-ticket-gen')
   .description('AI-powered CLI tool to parse roadmap documents and generate GitHub issues')
-  .version(packageJson.version);
+  .version(packageJson.version)
+  // Root convenience flag: `claude-ticket-gen --models` mirrors the `models`
+  // subcommand for users who reach for a flag first. Handled by the default
+  // action below (it runs only when no subcommand is given).
+  .option('--models', 'List available Claude models');
 
 // Config command
 program
@@ -46,6 +50,7 @@ program
   .option('--min-priority <level>', 'Minimum priority level (P0-P3)')
   .option('--include-optional', 'Include optional items')
   .option('--config <path>', 'Use specific config file')
+  .option('--model <id>', 'Claude model to use (overrides the configured default)')
   .action(async (file, options) => {
     const { generateCommand } = await import('./commands/generate.js');
     await generateCommand(file, options);
@@ -59,6 +64,26 @@ program
     const { initCommand } = await import('./commands/init.js');
     await initCommand();
   });
+
+// Models command
+program
+  .command('models')
+  .description('List available Claude models (queries the Anthropic API)')
+  .action(async () => {
+    const { modelsCommand } = await import('./commands/models.js');
+    await modelsCommand();
+  });
+
+// Default action: runs only when no subcommand is given. Handles the root
+// `--models` flag; otherwise shows help so a bare invocation is never silent.
+program.action(async () => {
+  if (program.opts().models) {
+    const { modelsCommand } = await import('./commands/models.js');
+    await modelsCommand();
+  } else {
+    program.help();
+  }
+});
 
 // Parse arguments
 program.parse();
