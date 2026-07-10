@@ -3,10 +3,10 @@ name: Publish Package to npm
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.0.5, v2.0.0, etc.
+      - 'v*'  # Triggers on version tags like v1.1.0, v2.0.0, etc.
 
 permissions:
-  id-token: write  # Required for OIDC trusted publishing
+  id-token: write  # Required for OIDC trusted publishing (npm authenticates via this token, no NPM_TOKEN)
   contents: read
 
 jobs:
@@ -19,8 +19,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # LTS version
+          # Trusted publishing requires Node >= 22.14.0; 24 is the version npm's
+          # docs recommend. registry-url still points publish at the public registry.
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing needs npm >= 11.5.1 — newer than the npm bundled with
+      # Node — so upgrade the CLI before publishing.
+      - name: Upgrade npm to a trusted-publishing-capable version
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -32,7 +39,9 @@ jobs:
       # - name: Run tests
       #   run: npm test
 
+      # Auth is via OIDC trusted publishing (configured on npmjs.com under the
+      # package's Settings -> Trusted Publisher), so there is no NODE_AUTH_TOKEN.
+      # Provenance is generated automatically under trusted publishing, so the
+      # --provenance flag is no longer needed.
       - name: Publish to npm
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
