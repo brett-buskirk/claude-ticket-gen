@@ -11,6 +11,8 @@ Claude Ticket Generator is a standalone npm package that uses Claude AI to intel
 - **AI-Powered Parsing**: Uses Claude AI to understand document structure and extract tasks
 - **Flexible Format Support**: Works with markdown checklists, bullet points, numbered lists, and plain text
 - **Smart Categorization**: Automatically detects priorities, task types, and labels
+- **Configurable Model**: Choose the Claude model per run (`--model`) or set a default in config
+- **Live Model Listing**: `models` command lists the models available to your API key, fetched live
 - **Duplicate Detection**: Checks for existing issues to prevent duplicates
 - **Dry Run Mode**: Preview issues before creating them
 - **Label Management**: Automatically creates and manages GitHub labels
@@ -44,6 +46,11 @@ Claude Ticket Generator is a standalone npm package that uses Claude AI to intel
 ```bash
 npm install -g claude-gh-ticket-gen
 ```
+
+> **Note the two names:** the npm package is **`claude-gh-ticket-gen`** (what you install and
+> update), but the command it installs is **`claude-ticket-gen`** (what you run). So it's
+> `npm install -g claude-gh-ticket-gen@latest` to update, then `claude-ticket-gen ...` to use.
+> (Unifying these is tracked in [#26](https://github.com/brett-buskirk/claude-ticket-gen/issues/26).)
 
 ### Local Installation
 
