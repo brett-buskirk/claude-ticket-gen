@@ -1,0 +1,50 @@
+name: Weekly smoke test
+
+# Catches "the world changed underneath us" failures that PR-time CI can't see —
+# a retired Claude model (which 404'd this tool before), an SDK/API change, or a
+# broken build against current deps. It runs the real happy path against the live
+# Anthropic API. A failed scheduled run emails the repo owner, so this is the
+# alert: green = still working in production, red = something rotted.
+#
+# Requires an ANTHROPIC_API_KEY repo secret (used only here). Cost per run is
+# negligible — one models-list call plus one small dry-run parse.
+
+on:
+  schedule:
+    - cron: '17 13 * * 1' # Mondays 13:17 UTC (off the top of the hour to avoid runner congestion)
+  workflow_dispatch: {} # allow on-demand runs from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - run: npm ci
+      - run: npm run build
+
+      # The parser reads the key from config (not the environment), so configure
+      # it the way a user would before exercising the generate path.
+      - name: Configure API key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node dist/cli/index.js config set anthropicApiKey "$ANTHROPIC_API_KEY"
+
+      # 1) API reachable + auth + SDK path still valid (lists live models).
+      - name: Models API reachable
+        run: node dist/cli/index.js models
+
+      # 2) The real generation path against a tiny fixture. --dry-run creates no
+      #    issues, but it still calls the configured model — exactly what a model
+      #    retirement or an API-shape change would break.
+      - name: Generate (dry-run) against fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node dist/cli/index.js generate test/fixtures/smoke-roadmap.md --repo "$GITHUB_REPOSITORY" --dry-run
