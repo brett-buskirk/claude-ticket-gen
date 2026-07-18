@@ -1,7 +1,7 @@
 # Roadmap
 
 `claude-ticket-gen` is a published, working CLI (npm: `claude-gh-ticket-gen`, currently
-**v1.1.0**). It parses roadmap/planning documents with Claude AI and creates structured
+**v2.0.0**). It parses roadmap/planning documents with Claude AI and creates structured
 GitHub issues. The core workflow is stable, and the model is now configurable (`--model`,
 a `model` config key, and a `models` command that lists what's available live).
 
