@@ -6,14 +6,24 @@ All notable changes to claude-ticket-gen are documented here. The format is base
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-18
+
+> ### ⚠️ Breaking: the minimum Node version is now 22.12
+> Node 18 and 20 have both reached end-of-life, and this release's dependency majors — notably
+> `commander` 15 — require Node **≥ 22.12** and can fail at runtime (not merely warn at install) on
+> older versions. **Upgrade Node to 22.12 or newer before updating.** No CLI commands or flags
+> changed; this release is purely a runtime-baseline and dependency refresh.
+
 ### Changed
+- **BREAKING: raised the Node `engines` floor from `>=18` to `>=22.12`.** See the note above.
 - Upgraded `@anthropic-ai/sdk` from 0.30 to 0.112. The `models` command now uses the SDK's native
-  `models.list()` resource (dropped the low-level `client.get('/v1/models')` shim).
-- Raised the Node `engines` floor from `>=18` to `>=22.12` (Node 18 and 20 are end-of-life, and
-  `commander` 15 requires `>=22.12`).
+  `models.list()` resource (the low-level `client.get('/v1/models')` shim is gone).
+- Updated runtime dependency majors: `commander` 12 → 15 and `ora` 8 → 9.
+- Updated dev dependencies: `@types/node` 20 → 26 and `tsx` to 4.23.1 (TypeScript held at 5.x).
 
 ### Added
-- A `build` (typecheck + `tsc`) CI gate on pull requests, required before merge.
+- A required `build` (typecheck + `tsc`) CI gate on pull requests, so dependency and code changes
+  are verified before merge.
 
 ## [1.1.0] - 2026-07-10
 
@@ -48,6 +58,7 @@ All notable changes to claude-ticket-gen are documented here. The format is base
 - CI/CD pipeline with automated npm publishing.
 - Package provenance and attestation via GitHub Actions.
 
-[Unreleased]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/brett-buskirk/claude-ticket-gen/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/brett-buskirk/claude-ticket-gen/releases/tag/v1.0.5
