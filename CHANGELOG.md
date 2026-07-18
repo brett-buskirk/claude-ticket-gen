@@ -9,7 +9,8 @@ All notable changes to claude-ticket-gen are documented here. The format is base
 ### Changed
 - Upgraded `@anthropic-ai/sdk` from 0.30 to 0.112. The `models` command now uses the SDK's native
   `models.list()` resource (dropped the low-level `client.get('/v1/models')` shim).
-- Raised the Node `engines` floor from `>=18` to `>=20` (Node 18 is end-of-life).
+- Raised the Node `engines` floor from `>=18` to `>=22.12` (Node 18 and 20 are end-of-life, and
+  `commander` 15 requires `>=22.12`).
 
 ### Added
 - A `build` (typecheck + `tsc`) CI gate on pull requests, required before merge.
